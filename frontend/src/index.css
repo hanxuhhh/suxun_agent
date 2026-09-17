@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── H5 工具类 ───────────────────────────── */
+
+/* 有底部 TabBar 的页面需要给内容留出安全距离 */
+.tab-page {
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+}
+
+/* iOS 安全区辅助 */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 隐藏横向滚动条（分类 tab 横滑） */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* H5 触控态：用 active 替代 hover */
+.touch-active {
+  transition: opacity 0.1s;
+}
+.touch-active:active {
+  opacity: 0.7;
+}
+
+/* 移动端点击高亮统一 */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 消除 iOS input/textarea 聚焦放大 */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+}

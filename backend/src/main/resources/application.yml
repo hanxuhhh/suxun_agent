@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: translate-backend
+  profiles:
+    active: dev
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+ai:
+  deepseek:
+    api-key: ${DEEPSEEK_API_KEY:your-deepseek-api-key-here}
+    base-url: https://api.deepseek.com
+    model: deepseek-chat
+  openai:
+    api-key: ${OPENAI_API_KEY:your-openai-api-key-here}
+    base-url: https://api.openai.com
+  groq:
+    api-key: ${GROQ_API_KEY:your-groq-api-key-here}
+    base-url: https://api.groq.com/openai
+
+amap:
+  key: ${AMAP_KEY:your-amap-key-here}
+  base-url: https://restapi.amap.com/v3

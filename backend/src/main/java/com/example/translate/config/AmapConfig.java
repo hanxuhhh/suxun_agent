@@ -1,0 +1,17 @@
+package com.example.translate.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AmapConfig {
+
+    @Value("${amap.key}")
+    private String key;
+
+    @Value("${amap.base-url}")
+    private String baseUrl;
+
+    public String getKey() { return key; }
+    public String getBaseUrl() { return baseUrl; }
+}

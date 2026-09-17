@@ -1,0 +1,37 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# 本地 HTTPS 证书（含私钥，切勿提交）
+*.pem
+
+# IDE 内部目录
+.codeflicker/
+
+# 环境变量（.env.production 无敏感信息，保留提交；本地覆盖用 .env.local）
+.env.local
+.env.*.local
+
+# 编辑器/系统
+.DS_Store
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
