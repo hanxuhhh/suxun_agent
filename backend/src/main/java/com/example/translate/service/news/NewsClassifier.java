@@ -47,7 +47,11 @@ public class NewsClassifier {
                 "NBA", "篮球", "勒布朗", "库里", "杜兰特", "字母哥", "詹姆斯",
                 "湖人", "勇士", "凯尔特人", "热火", "公牛", "马刺", "快船",
                 "总冠军", "季后赛", "选秀", "交易截止", "全明星", "MVP",
-                "东部", "西部", "总决赛", "三分", "扣篮", "得分王"
+                "东部", "西部", "总决赛", "三分", "扣篮", "得分王",
+                // 英文源（ESPN / Sky Sports）关键词：不含 Heat / draft 等易误伤的通用词
+                "basketball", "playoffs", "finals", "Lakers", "Warriors",
+                "Celtics", "Bulls", "Spurs", "Clippers", "LeBron", "Curry",
+                "Durant", "Giannis", "hoops"
         ));
         CATEGORY_KEYWORDS.put("society", Arrays.asList(
                 "社会", "民生", "教育", "就业", "生育", "老龄", "医保",
@@ -73,7 +77,8 @@ public class NewsClassifier {
                 .max(Map.Entry.comparingByValue())
                 .filter(e -> e.getValue() > 0)
                 .map(Map.Entry::getKey)
-                .orElse("society");
+                // 匹配不到任何关键词时返回 null，由调用方按「源默认分类」归档
+                .orElse(null);
     }
 
     public String detectImportance(String title) {

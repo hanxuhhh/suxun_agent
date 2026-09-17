@@ -40,8 +40,19 @@ public class RssNewsSource {
             // 国际 - NPR World
             new String[]{"NPR World", "https://feeds.npr.org/1004/rss.xml", "international"},
             // 科学 - NASA
-            new String[]{"NASA", "https://www.nasa.gov/news-release/feed/", "science"}
+            new String[]{"NASA", "https://www.nasa.gov/news-release/feed/", "science"},
+            // NBA - ESPN（官方实时新闻）
+            new String[]{"ESPN NBA", "https://www.espn.com/espn/rss/nba/news", "nba"},
+            // NBA - Yahoo Sports（纯 NBA 内容，更新频繁）
+            new String[]{"Yahoo NBA", "https://sports.yahoo.com/nba/rss/", "nba"},
+            // 社会 - 中新网滚动新闻（中文实时社会/民生新闻）
+            new String[]{"中新网", "https://www.chinanews.com.cn/rss/scroll-news.xml", "society"}
     );
+
+    /** RSS 源数量（供统计展示） */
+    public int sourceCount() {
+        return RSS_SOURCES.size();
+    }
 
     public List<NewsItem> fetchAll() {
         List<NewsItem> result = new ArrayList<>();
@@ -77,8 +88,9 @@ public class RssNewsSource {
                 // Skip entries that look like navigation/homepage links (too short or no summary)
                 if (title.length() < 10 && summary.isEmpty()) continue;
 
+                // 关键词匹配不到时，按源自身的主题归档（源的分类是确定的）
                 String category = classifier.classify(title, summary);
-                if ("society".equals(category)) category = defaultCategory;
+                if (category == null) category = defaultCategory;
 
                 String importance = classifier.detectImportance(title);
 

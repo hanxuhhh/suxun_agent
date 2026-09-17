@@ -32,6 +32,10 @@ public class NewsAggregatorService {
     // In-memory store updated by scheduler
     private volatile List<NewsItem> cachedNews = new ArrayList<>();
     private volatile LocalDateTime lastUpdate = LocalDateTime.now();
+    private volatile int activeSourceCount = 0;
+
+    /** 新闻新鲜度窗口：超过 30 天的旧闻直接丢弃，避免陈年数据污染列表 */
+    private static final int FRESHNESS_DAYS = 30;
 
     @PostConstruct
     public void init() {
@@ -45,17 +49,27 @@ public class NewsAggregatorService {
         List<NewsItem> merged = new ArrayList<>();
 
         // 1. Try RSS sources
+        int rssCount = 0;
         try {
             List<NewsItem> rssItems = rssNewsSource.fetchAll();
             merged.addAll(rssItems);
+            rssCount = rssItems.size();
             log.info("RSS fetched {} items", rssItems.size());
         } catch (Exception e) {
             log.warn("RSS fetch failed: {}", e.getMessage());
         }
 
-        // 2. Always include mock data as supplement / fallback
-        List<NewsItem> mockItems = mockNewsSource.getNews();
-        merged.addAll(mockItems);
+        // 2. RSS 全部失败时才用 mock 数据兑底，避免一年前的假旧闻常年霸占列表
+        if (rssCount == 0) {
+            List<NewsItem> mockItems = mockNewsSource.getNews();
+            merged.addAll(mockItems);
+            log.warn("RSS empty, falling back to {} mock items", mockItems.size());
+        }
+
+        // 3. 过滤太久远的旧闻，只保留 FRESHNESS_DAYS 天内的实时新闻
+        LocalDateTime freshnessLimit = LocalDateTime.now().minusDays(FRESHNESS_DAYS);
+        merged.removeIf(item -> item.getPublishTime() != null
+                && item.getPublishTime().isBefore(freshnessLimit));
 
         // 3. Deduplicate by title similarity (simple)
         Set<String> seen = new java.util.HashSet<>();
@@ -72,7 +86,12 @@ public class NewsAggregatorService {
 
         cachedNews = deduped;
         lastUpdate = LocalDateTime.now();
-        log.info("News cache updated with {} items", cachedNews.size());
+        activeSourceCount = (int) deduped.stream()
+                .map(NewsItem::getSource)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .count();
+        log.info("News cache updated with {} items from {} sources", cachedNews.size(), activeSourceCount);
     }
 
     @Cacheable("news")
@@ -114,7 +133,7 @@ public class NewsAggregatorService {
                 .items(paged)
                 .categoryCount(categoryCount)
                 .totalToday((int) todayCount)
-                .sourceCount(8) // 7 RSS sources + mock
+                .sourceCount(activeSourceCount)
                 .lastUpdate(lastUpdate)
                 .build();
     }
@@ -132,7 +151,7 @@ public class NewsAggregatorService {
         stats.put("totalToday", (int) todayCount);
         stats.put("total", cachedNews.size());
         stats.put("lastUpdate", lastUpdate);
-        stats.put("sourceCount", 8);
+        stats.put("sourceCount", activeSourceCount);
         stats.put("categoryCount", categoryCount);
         return stats;
     }
